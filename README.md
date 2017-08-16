@@ -38,8 +38,7 @@ The following **additional** features are implemented:
 
 Here's a walkthrough of implemented user stories:
 
-![Simple Todo](http://imgur.com/a/YTxg6.gif "Jennifer's Simple Todo")
-
+![Simple Todo](http://imgur.com/sptWQ5k.gif "Jennifer's Simple Todo")
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
