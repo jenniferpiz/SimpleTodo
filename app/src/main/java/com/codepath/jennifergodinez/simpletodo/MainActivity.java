@@ -1,6 +1,7 @@
 package com.codepath.jennifergodinez.simpletodo;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -9,29 +10,37 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+
+import nl.qbusict.cupboard.QueryResultIterable;
+
+import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 public class MainActivity extends AppCompatActivity {
-    ArrayList<String> items;
-    ArrayAdapter<String> itemsAdapter;
+    ArrayList<ToDo> todoArray;
+    ArrayList<String> tnames;
+    ArrayAdapter<String> tnamesAdapter;
     ListView lvItems;
     static final int EDIT_ITEM_REQUEST = 100;
+    static SQLiteDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         lvItems = (ListView)findViewById(R.id.lvItems);
-        //items = new ArrayList<String>();
-        readItems();
-        itemsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, items );
-        lvItems.setAdapter(itemsAdapter);
-        //items.add("First Item");
-        //items.add("Second Item");
+
+        // setup database
+        PracticeDatabaseHelper dbHelper = new PracticeDatabaseHelper(this);
+        dbHelper.onUpgrade(dbHelper.getWritableDatabase(), 1, 2);
+        db = dbHelper.getWritableDatabase();
+
+        tnames = getAllNames();
+        tnamesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, tnames );
+        
+        lvItems.setAdapter(tnamesAdapter);
         setupListViewListener();
     }
 
@@ -39,9 +48,11 @@ public class MainActivity extends AppCompatActivity {
         lvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View v, int pos, long id) {
-                items.remove(pos);
-                writeItems();
-                itemsAdapter.notifyDataSetChanged();
+                ToDo td = todoArray.get(pos);
+                cupboard().withDatabase(db).delete(ToDo.class, td.get_id());
+                todoArray.remove(pos);
+                tnames.remove(pos);
+                tnamesAdapter.notifyDataSetChanged();
                 return true;
             }
         });
@@ -50,12 +61,11 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View v, int pos, long id) {
                 String value = (String)adapterView.getItemAtPosition(pos);
                 launchEditActivity(value, pos);
-                return ;
             }
         });
     }
 
-    public void launchEditActivity(String itemName, int pos) {
+    private void launchEditActivity(String itemName, int pos) {
         Intent i = new Intent(MainActivity.this, EditItemActivity.class);
         i.putExtra("itemName", itemName);
         i.putExtra("pos", pos);
@@ -64,45 +74,49 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent i) {
-        // REQUEST_CODE is defined above
         if (resultCode == RESULT_OK && requestCode == EDIT_ITEM_REQUEST) {
-            // Extract edited item from result extras
+            // Update the item
             String editItem = i.getExtras().getString("itemName");
             int pos = i.getExtras().getInt("pos", 0);
-            items.remove(items.get(pos));
-            items.add(pos, editItem);
-            writeItems();
-            itemsAdapter.notifyDataSetChanged();
+            tnames.set(pos, editItem);
+
+            ToDo td = todoArray.get(pos);
+            td.setName(editItem);
+            cupboard().withDatabase(db).put(td);
+            tnamesAdapter.notifyDataSetChanged();
         }
     }
 
     public void onAddItem(View vew) {
         EditText etNewItem = (EditText)findViewById(R.id.etNewItem);
         String itemText = etNewItem.getText().toString();
-        itemsAdapter.add(itemText);
-        writeItems();
+        tnamesAdapter.add(itemText);
+        ToDo toDo = new ToDo(itemText);
+        todoArray.add(toDo);
+        cupboard().withDatabase(db).put(toDo);
         etNewItem.setText("");
     }
 
-    private void writeItems() {
-        File dir = getFilesDir();
-        File todoFile = new File(dir, "todo.txt");
-
-        try {
-            FileUtils.writeLines(todoFile, items);
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
+    private static List<ToDo> getListFromQueryResultIterator(QueryResultIterable<ToDo> iter) {
+        final List<ToDo> items = new ArrayList<ToDo>();
+        for (ToDo item : iter) {
+            items.add(item);
         }
+        iter.close();
+
+        return items;
     }
 
-    private void readItems() {
-        File dir = getFilesDir();
-        File todoFile = new File(dir, "todo.txt");
+    public ArrayList<String> getAllNames() {
+        final QueryResultIterable<ToDo> iter = cupboard().withDatabase(db).query(ToDo.class).query();
+        todoArray = (ArrayList<ToDo>) getListFromQueryResultIterator(iter);
 
-        try {
-            items = new ArrayList<String>(FileUtils.readLines(todoFile));
-        } catch (IOException ioe) {
-            items = new ArrayList<String>();
+        ArrayList<String> tnameArray = new ArrayList<String>();
+        for (ToDo b : todoArray) {
+            tnameArray.add(b.getName());
         }
+
+        return tnameArray;
     }
+
 }
