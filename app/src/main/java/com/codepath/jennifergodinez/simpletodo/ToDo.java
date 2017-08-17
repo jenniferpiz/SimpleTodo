@@ -1,16 +1,22 @@
 package com.codepath.jennifergodinez.simpletodo;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by jennifergodinez on 8/15/17.
  */
 
-public class ToDo {
+class ToDo {
     public Long _id; // for cupboard
-    public String name; // bunny name
-    public Integer priority ;
-    public Date dueDate;
+    public String name;
+    public String priority ;
+    public String date;
+    private static SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy", Locale.US);
+
+    private Date dueDate;
 
 
     public ToDo() {
@@ -18,18 +24,21 @@ public class ToDo {
     }
 
     public ToDo(String n) {
-        this.name = n;
+        this(n, "7-Jun-2013");
     }
 
-    public ToDo(String n, Date d) {
-        this.name = n;
-        this.dueDate = d;
+    public ToDo(String n, String d) {
+        this(n, d, "LOW");
     }
 
-    public ToDo(String n, Date d, Integer p) {
+    public ToDo(String n, String d, String p) {
         this.name = n;
-        this.dueDate = d;
+        this.date = d;
         this.priority = p;
+        try {
+            this.dueDate = formatter.parse(d);
+        } catch (ParseException pe) {
+        }
     }
 
     public String getName() {

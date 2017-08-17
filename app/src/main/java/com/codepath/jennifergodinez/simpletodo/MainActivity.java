@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -19,8 +18,7 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 public class MainActivity extends AppCompatActivity {
     ArrayList<ToDo> todoArray;
-    ArrayList<String> tnames;
-    ArrayAdapter<String> tnamesAdapter;
+    TodosAdapter todosAdapter;
     ListView lvItems;
     static final int EDIT_ITEM_REQUEST = 100;
     static SQLiteDatabase db;
@@ -30,17 +28,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        lvItems = (ListView)findViewById(R.id.lvItems);
-
         // setup database
         PracticeDatabaseHelper dbHelper = new PracticeDatabaseHelper(this);
         dbHelper.onUpgrade(dbHelper.getWritableDatabase(), 1, 2);
         db = dbHelper.getWritableDatabase();
 
-        tnames = getAllNames();
-        tnamesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, tnames );
-        
-        lvItems.setAdapter(tnamesAdapter);
+        // init todoArray
+        final QueryResultIterable<ToDo> iter = cupboard().withDatabase(db).query(ToDo.class).query();
+        todoArray = (ArrayList<ToDo>) getListFromQueryResultIterator(iter);
+
+        //set-up ListView
+        todosAdapter = new TodosAdapter(this, todoArray);
+        lvItems = (ListView)findViewById(R.id.lvItems);
+        lvItems.setAdapter(todosAdapter);
         setupListViewListener();
     }
 
@@ -51,23 +51,26 @@ public class MainActivity extends AppCompatActivity {
                 ToDo td = todoArray.get(pos);
                 cupboard().withDatabase(db).delete(ToDo.class, td.get_id());
                 todoArray.remove(pos);
-                tnames.remove(pos);
-                tnamesAdapter.notifyDataSetChanged();
+                //tnames.remove(pos);
+                //tnamesAdapter.notifyDataSetChanged();
+                todosAdapter.notifyDataSetChanged();
                 return true;
             }
         });
         lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View v, int pos, long id) {
-                String value = (String)adapterView.getItemAtPosition(pos);
-                launchEditActivity(value, pos);
+                ToDo value = (ToDo) adapterView.getItemAtPosition(pos);
+                launchEditActivity(value.name, value.date, value.priority, pos);
             }
         });
     }
 
-    private void launchEditActivity(String itemName, int pos) {
+    private void launchEditActivity(String name, String date, String priority, int pos) {
         Intent i = new Intent(MainActivity.this, EditItemActivity.class);
-        i.putExtra("itemName", itemName);
+        i.putExtra("name", name);
+        i.putExtra("date", date);
+        i.putExtra("priority", priority);
         i.putExtra("pos", pos);
         startActivityForResult(i, EDIT_ITEM_REQUEST);
     }
@@ -75,26 +78,28 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent i) {
         if (resultCode == RESULT_OK && requestCode == EDIT_ITEM_REQUEST) {
-            // Update the item
-            String editItem = i.getExtras().getString("itemName");
+            // Update the selected item
+            String newName = i.getExtras().getString("name");
+            //String newDate = i.getExtras().getString("date");
+            //String newPriority = i.getExtras().getString("priority");
             int pos = i.getExtras().getInt("pos", 0);
-            tnames.set(pos, editItem);
-
             ToDo td = todoArray.get(pos);
-            td.setName(editItem);
+            td.setName(newName);
+            //td.setDate(newDate);
+            //td.setPriority(newPriority);
             cupboard().withDatabase(db).put(td);
-            tnamesAdapter.notifyDataSetChanged();
+            todosAdapter.notifyDataSetChanged();
         }
     }
 
     public void onAddItem(View vew) {
         EditText etNewItem = (EditText)findViewById(R.id.etNewItem);
         String itemText = etNewItem.getText().toString();
-        tnamesAdapter.add(itemText);
         ToDo toDo = new ToDo(itemText);
         todoArray.add(toDo);
         cupboard().withDatabase(db).put(toDo);
         etNewItem.setText("");
+        todosAdapter.notifyDataSetChanged();
     }
 
     private static List<ToDo> getListFromQueryResultIterator(QueryResultIterable<ToDo> iter) {
@@ -106,17 +111,4 @@ public class MainActivity extends AppCompatActivity {
 
         return items;
     }
-
-    public ArrayList<String> getAllNames() {
-        final QueryResultIterable<ToDo> iter = cupboard().withDatabase(db).query(ToDo.class).query();
-        todoArray = (ArrayList<ToDo>) getListFromQueryResultIterator(iter);
-
-        ArrayList<String> tnameArray = new ArrayList<String>();
-        for (ToDo b : todoArray) {
-            tnameArray.add(b.getName());
-        }
-
-        return tnameArray;
-    }
-
 }

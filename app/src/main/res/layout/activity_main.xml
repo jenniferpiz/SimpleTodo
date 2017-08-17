@@ -11,11 +11,11 @@
         android:id="@+id/btnAddItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:onClick="onAddItem"
-        android:text="@string/str_AddItem" />
+        android:text="@string/str_AddItem"
+        android:layout_alignParentBottom="true" />
 
     <EditText
         android:id="@+id/etNewItem"

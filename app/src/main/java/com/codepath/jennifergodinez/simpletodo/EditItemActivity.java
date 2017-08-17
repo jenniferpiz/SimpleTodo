@@ -13,17 +13,19 @@ public class EditItemActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_item);
-        String itemName = getIntent().getStringExtra("itemName");
+        String name = getIntent().getStringExtra("name");
+        String date = getIntent().getStringExtra("date");
+        String priority = getIntent().getStringExtra("priority");
         pos = getIntent().getIntExtra("pos", 0);
         EditText editText = (EditText)findViewById(R.id.etEditItem);
-        editText.setText(itemName);
+        editText.setText(name);
         editText.requestFocus();
     }
 
     public void onEditItem(View v) {
         EditText etName = (EditText) findViewById(R.id.etEditItem);
         Intent data = new Intent();
-        data.putExtra("itemName", etName.getText().toString());
+        data.putExtra("name", etName.getText().toString());
         data.putExtra("pos", pos);
         setResult(RESULT_OK, data);
         this.finish();
