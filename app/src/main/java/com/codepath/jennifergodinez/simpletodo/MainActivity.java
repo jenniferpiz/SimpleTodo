@@ -3,6 +3,7 @@ package com.codepath.jennifergodinez.simpletodo;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -61,9 +62,28 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View v, int pos, long id) {
                 ToDo value = (ToDo) adapterView.getItemAtPosition(pos);
-                launchEditActivity(value.name, value.date, value.priority, pos);
+                //launchEditActivity(value.name, value.date, value.priority, pos);
+                showEditDialog(value.name, value.date, value.priority, pos);
             }
         });
+    }
+
+    private void showEditDialog(String name, String date, String priority, int pos) {
+        FragmentManager fm = getSupportFragmentManager();
+        TodoDialogFragment editTodoDialogFragment = TodoDialogFragment.newInstance("Some Title", name, date, priority, pos);
+
+        // Setup the listener for this object
+        editTodoDialogFragment.setCustomObjectListener(new TodoDialogFragment.TodoDialogListener() {
+            @Override
+            public void onFinishEditDialog(String newName, int pos) {
+                ToDo td = todoArray.get(pos);
+                td.setName(newName);
+                cupboard().withDatabase(db).put(td);
+                todosAdapter.notifyDataSetChanged();
+            }
+        });
+        editTodoDialogFragment.show(fm, "fragment_edit_todo");
+
     }
 
     private void launchEditActivity(String name, String date, String priority, int pos) {
