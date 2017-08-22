@@ -24,7 +24,7 @@ class ToDo {
     }
 
     public ToDo(String n) {
-        this(n, "7-Jun-2013");
+        this(n, "");
     }
 
     public ToDo(String n, String d) {
@@ -47,6 +47,9 @@ class ToDo {
 
     public void setName(String name) {
         this.name = name;
+    }
+    public void setDate(String date) {
+        this.date = date;
     }
 
     public Long get_id() {

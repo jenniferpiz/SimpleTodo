@@ -3,7 +3,10 @@
     <string name="str_newItem">New Item</string>
     <string name="str_enterNewItem">Enter new item</string>
     <string name="str_AddItem">Add Item</string>
-    <string name="str_editItem">Edit Item Below</string>
+    <string name="str_editItem">To Do Item</string>
     <string name="str_Save">Save</string>
     <string name="todo_str">To Do Name</string>
+    <string name="str_dueDate">Due Date</string>
+    <string name="str_priority">Priority</string>
+    <string name="str_done">Done</string>
 </resources>

@@ -5,14 +5,49 @@
     android:layout_gravity="center" android:orientation="vertical"  >
 
     <TextView
-        android:id="@+id/lbl_your_name"
+        android:id="@+id/lbl_todo_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/todo_str" />
+        android:text="@string/str_editItem" />
 
     <EditText
-        android:id="@+id/txt_your_name"
-        android:layout_width="288dp"  android:layout_height="wrap_content"
-        android:inputType="text"
-        android:imeOptions="actionDone" />
+        android:id="@+id/txt_todo_name"
+        android:layout_width="288dp"
+        android:layout_height="wrap_content"
+        android:imeOptions="actionDone"
+        android:inputType="text" />
+<!--
+    <TextView
+        android:id="@+id/lbl_due_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/str_dueDate" />
+
+    <EditText
+        android:id="@+id/txt_due_date"
+        android:layout_width="288dp"
+        android:layout_height="wrap_content"
+        android:imeOptions="actionDone"
+        android:inputType="text" />
+
+    <TextView
+        android:id="@+id/lbl_priority"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/str_priority" />
+
+    <EditText
+        android:id="@+id/txt_priority"
+        android:layout_width="288dp"
+        android:layout_height="wrap_content"
+        android:imeOptions="actionDone"
+        android:inputType="text" />
+
+    <Button
+        android:id="@+id/btnDoneItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onDoneClick"
+        android:text="@string/str_done" />
+    -->
 </LinearLayout>

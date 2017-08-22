@@ -4,6 +4,8 @@ package com.codepath.jennifergodinez.simpletodo;
  * Created by jennifergodinez on 8/20/17.
  */
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -21,17 +23,16 @@ import android.widget.TextView.OnEditorActionListener;
 public class TodoDialogFragment extends DialogFragment implements OnEditorActionListener {
 
     private EditText mEditText;
+    private EditText etDate;
+    private EditText etPriority;
     private TodoDialogListener listener;
 
     public TodoDialogFragment() {
-        // Empty constructor is required for DialogFragment
-        // Make sure not to add arguments to the constructor
-        // Use `newInstance` instead as shown below
         this.listener = null;
     }
 
     public interface TodoDialogListener {
-        void onFinishEditDialog(String name, int pos);
+        void onFinishEditDialog(String name, String dueDate, int pos);
     }
 
     public static TodoDialogFragment newInstance(String title, String name, String date, String priority, int pos) {
@@ -56,12 +57,14 @@ public class TodoDialogFragment extends DialogFragment implements OnEditorAction
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // Get field from view
-        mEditText = (EditText) view.findViewById(R.id.txt_your_name);
+        mEditText = (EditText) view.findViewById(R.id.txt_todo_name);
+
         // Fetch arguments from bundle and set title
-        String title = getArguments().getString("title", "Enter Name");
+        String title = getArguments().getString("title", "Enter Item Below");
         getDialog().setTitle(title);
-        String name = getArguments().getString("name", "task 1");
+        String name = getArguments().getString("name", "default task");
         mEditText.setText(name);
+
         // Show soft keyboard automatically and request focus to field
         mEditText.requestFocus();
         getDialog().getWindow().setSoftInputMode(
@@ -78,8 +81,30 @@ public class TodoDialogFragment extends DialogFragment implements OnEditorAction
     @Override
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
         if (EditorInfo.IME_ACTION_DONE == actionId) {
-            // Return input text back to activity through the implemented listener
-            listener.onFinishEditDialog(mEditText.getText().toString(), getArguments().getInt("pos"));
+            AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+            b.setMessage("Do you want to set the Due Date?");
+            //final EditText input = new EditText(getActivity());
+            //b.setView(input);
+            b.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    //result = input.getText().toString();
+                    if (dialog != null)  {
+                        listener.onFinishEditDialog(mEditText.getText().toString(), "21 Aug 1995", getArguments().getInt("pos"));
+                        dialog.dismiss();
+                    }
+                }
+            });
+            b.setNegativeButton("NO",  new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (dialog != null)  {
+                        listener.onFinishEditDialog(mEditText.getText().toString(), "", getArguments().getInt("pos"));
+                        dialog.dismiss();
+                    }
+                }
+            });
+            b.show();
             // Close the dialog and return back to the parent activity
             dismiss();
             return true;
@@ -87,22 +112,4 @@ public class TodoDialogFragment extends DialogFragment implements OnEditorAction
         return false;
     }
 
-    /*
-    // Store the listener (activity) that will have events fired once the fragment is attached
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof TodoDialogListener) {
-            listener = (TodoDialogListener) context;
-        } else {
-            throw new ClassCastException(context.toString()
-                    + " must implement MyListFragment.TodoDialogListener");
-        }
-    }
-
-    // Now we can fire the event when the user selects something in the fragment
-    public void onSomeClick(View v) {
-        listener.onRssItemSelected("some link");
-    }
-*/
 }

@@ -1,13 +1,11 @@
 package com.codepath.jennifergodinez.simpletodo;
 
-import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -52,8 +50,6 @@ public class MainActivity extends AppCompatActivity {
                 ToDo td = todoArray.get(pos);
                 cupboard().withDatabase(db).delete(ToDo.class, td.get_id());
                 todoArray.remove(pos);
-                //tnames.remove(pos);
-                //tnamesAdapter.notifyDataSetChanged();
                 todosAdapter.notifyDataSetChanged();
                 return true;
             }
@@ -62,22 +58,40 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View v, int pos, long id) {
                 ToDo value = (ToDo) adapterView.getItemAtPosition(pos);
-                //launchEditActivity(value.name, value.date, value.priority, pos);
                 showEditDialog(value.name, value.date, value.priority, pos);
             }
         });
     }
 
+    public void onAddItem(View view) {
+        final FragmentManager fm = getSupportFragmentManager();
+        TodoDialogFragment editTodoDialogFragment = TodoDialogFragment.newInstance("Add Item", "", "", "", 0);
+
+        // Setup the listener for this object
+        editTodoDialogFragment.setCustomObjectListener(new TodoDialogFragment.TodoDialogListener() {
+            @Override
+            public void onFinishEditDialog(String newName, String newDate, int pos) {
+                ToDo toDo = new ToDo(newName, newDate);
+                todoArray.add(toDo);
+                cupboard().withDatabase(db).put(toDo);
+                todosAdapter.notifyDataSetChanged();
+
+            }
+        });
+        editTodoDialogFragment.show(fm, "fragment_edit_todo");
+    }
+
     private void showEditDialog(String name, String date, String priority, int pos) {
-        FragmentManager fm = getSupportFragmentManager();
+        final FragmentManager fm = getSupportFragmentManager();
         TodoDialogFragment editTodoDialogFragment = TodoDialogFragment.newInstance("Some Title", name, date, priority, pos);
 
         // Setup the listener for this object
         editTodoDialogFragment.setCustomObjectListener(new TodoDialogFragment.TodoDialogListener() {
             @Override
-            public void onFinishEditDialog(String newName, int pos) {
+            public void onFinishEditDialog(String newName, String newDate, int pos) {
                 ToDo td = todoArray.get(pos);
                 td.setName(newName);
+                td.setDate(newDate);
                 cupboard().withDatabase(db).put(td);
                 todosAdapter.notifyDataSetChanged();
             }
@@ -86,49 +100,12 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void launchEditActivity(String name, String date, String priority, int pos) {
-        Intent i = new Intent(MainActivity.this, EditItemActivity.class);
-        i.putExtra("name", name);
-        i.putExtra("date", date);
-        i.putExtra("priority", priority);
-        i.putExtra("pos", pos);
-        startActivityForResult(i, EDIT_ITEM_REQUEST);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent i) {
-        if (resultCode == RESULT_OK && requestCode == EDIT_ITEM_REQUEST) {
-            // Update the selected item
-            String newName = i.getExtras().getString("name");
-            //String newDate = i.getExtras().getString("date");
-            //String newPriority = i.getExtras().getString("priority");
-            int pos = i.getExtras().getInt("pos", 0);
-            ToDo td = todoArray.get(pos);
-            td.setName(newName);
-            //td.setDate(newDate);
-            //td.setPriority(newPriority);
-            cupboard().withDatabase(db).put(td);
-            todosAdapter.notifyDataSetChanged();
-        }
-    }
-
-    public void onAddItem(View vew) {
-        EditText etNewItem = (EditText)findViewById(R.id.etNewItem);
-        String itemText = etNewItem.getText().toString();
-        ToDo toDo = new ToDo(itemText);
-        todoArray.add(toDo);
-        cupboard().withDatabase(db).put(toDo);
-        etNewItem.setText("");
-        todosAdapter.notifyDataSetChanged();
-    }
-
     private static List<ToDo> getListFromQueryResultIterator(QueryResultIterable<ToDo> iter) {
         final List<ToDo> items = new ArrayList<ToDo>();
         for (ToDo item : iter) {
             items.add(item);
         }
         iter.close();
-
         return items;
     }
 }
