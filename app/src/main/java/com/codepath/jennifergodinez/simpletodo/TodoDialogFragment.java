@@ -4,8 +4,6 @@ package com.codepath.jennifergodinez.simpletodo;
  * Created by jennifergodinez on 8/20/17.
  */
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -23,8 +21,7 @@ import android.widget.TextView.OnEditorActionListener;
 public class TodoDialogFragment extends DialogFragment implements OnEditorActionListener {
 
     private EditText mEditText;
-    private EditText etDate;
-    private EditText etPriority;
+    private TextView mLabelText;
     private TodoDialogListener listener;
 
     public TodoDialogFragment() {
@@ -32,7 +29,7 @@ public class TodoDialogFragment extends DialogFragment implements OnEditorAction
     }
 
     public interface TodoDialogListener {
-        void onFinishEditDialog(String name, String dueDate, int pos);
+        void onFinishEditDialog(String name, int pos);
     }
 
     public static TodoDialogFragment newInstance(String title, String name, String date, String priority, int pos) {
@@ -47,6 +44,10 @@ public class TodoDialogFragment extends DialogFragment implements OnEditorAction
         return frag;
     }
 
+    public void setCustomObjectListener(TodoDialogListener listener) {
+        this.listener = listener;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -58,10 +59,11 @@ public class TodoDialogFragment extends DialogFragment implements OnEditorAction
         super.onViewCreated(view, savedInstanceState);
         // Get field from view
         mEditText = (EditText) view.findViewById(R.id.txt_todo_name);
+        mLabelText = (TextView) view.findViewById(R.id.lbl_todo_name);
 
         // Fetch arguments from bundle and set title
         String title = getArguments().getString("title", "Enter Item Below");
-        getDialog().setTitle(title);
+        mLabelText.setText(title);
         String name = getArguments().getString("name", "default task");
         mEditText.setText(name);
 
@@ -73,43 +75,15 @@ public class TodoDialogFragment extends DialogFragment implements OnEditorAction
         mEditText.setOnEditorActionListener(this);
     }
 
-    public void setCustomObjectListener(TodoDialogListener listener) {
-        this.listener = listener;
-    }
-
-
     @Override
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
         if (EditorInfo.IME_ACTION_DONE == actionId) {
-            AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
-            b.setMessage("Do you want to set the Due Date?");
-            //final EditText input = new EditText(getActivity());
-            //b.setView(input);
-            b.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    //result = input.getText().toString();
-                    if (dialog != null)  {
-                        listener.onFinishEditDialog(mEditText.getText().toString(), "21 Aug 1995", getArguments().getInt("pos"));
-                        dialog.dismiss();
-                    }
-                }
-            });
-            b.setNegativeButton("NO",  new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    if (dialog != null)  {
-                        listener.onFinishEditDialog(mEditText.getText().toString(), "", getArguments().getInt("pos"));
-                        dialog.dismiss();
-                    }
-                }
-            });
-            b.show();
-            // Close the dialog and return back to the parent activity
+            listener.onFinishEditDialog(mEditText.getText().toString(), getArguments().getInt("pos"));
             dismiss();
             return true;
         }
         return false;
     }
+
 
 }

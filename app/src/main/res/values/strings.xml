@@ -9,4 +9,8 @@
     <string name="str_dueDate">Due Date</string>
     <string name="str_priority">Priority</string>
     <string name="str_done">Done</string>
+    <string name="HIGH" />
+    <string name="str_medium">MEDIUM</string>
+    <string name="str_high">HIGH</string>
+    <string name="str_low">LOW</string>
 </resources>
