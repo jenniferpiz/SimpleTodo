@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -32,12 +31,10 @@
         android:layout_height="wrap_content"
         android:onClick="onEditItem"
         android:text="@string/str_Save"
-        android:layout_marginTop="28dp"
-        android:layout_below="@+id/radioButton3"
+        android:layout_marginTop="58dp"
+        android:layout_below="@+id/radioPriority"
         android:layout_alignRight="@+id/editDate"
-        android:layout_alignEnd="@+id/editDate"
-        android:layout_marginRight="12dp"
-        android:layout_marginEnd="12dp" />
+        android:layout_alignEnd="@+id/editDate" />
 
     <TextView
         android:id="@+id/textDate"
@@ -60,7 +57,7 @@
         android:inputType="date" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/textPriority"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -69,31 +66,32 @@
         android:layout_marginTop="26dp"
         android:text="@string/str_priority" />
 
-    <RadioButton
-        android:id="@+id/radioButton"
+    <RadioGroup
+        android:id="@+id/radioPriority"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/str_high"
-        android:layout_below="@+id/textView3"
+        android:layout_below="@+id/textPriority"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true">
 
-    <RadioButton
-        android:id="@+id/radioButton2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/radioButton"
-        android:text="@string/str_medium" />
+        <RadioButton
+            android:id="@+id/rbHigh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/str_high" />
 
-    <RadioButton
-        android:id="@+id/radioButton3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/str_low"
-        android:layout_below="@+id/radioButton2"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        <RadioButton
+            android:id="@+id/rbMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/str_medium"
+            android:checked="true" />
+
+        <RadioButton
+            android:id="@+id/rbLow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/str_low" />
+    </RadioGroup>
 
 </RelativeLayout>

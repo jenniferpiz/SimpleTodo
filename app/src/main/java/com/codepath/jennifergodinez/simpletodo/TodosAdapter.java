@@ -29,25 +29,30 @@ class TodosAdapter extends ArrayAdapter<ToDo> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_todo, parent, false);
         }
         // Lookup view for data population
-        TextView tvName = (TextView) convertView.findViewById(R.id.tvName);
-        TextView tvDate = (TextView) convertView.findViewById(R.id.tvDate);
+        TextView tvName = convertView.findViewById(R.id.tvName);
+        TextView tvDate = convertView.findViewById(R.id.tvDate);
 
         // Populate the data into the template view using the data object
         ToDo toDo = getItem(position);
         if (toDo != null) {
             tvName.setText(toDo.name);
+            if (toDo.priority.equals("HIGH")) {
+                tvName.setBackgroundColor(Color.RED);
+            } else if (toDo.priority.equals("MEDIUM")) {
+                tvName.setBackgroundColor(Color.YELLOW);
+            } else if (toDo.priority.equals("LOW")) {
+                tvName.setBackgroundColor(Color.GREEN);
+            }
+
             tvDate.setText(toDo.date);
+
+            //change appearance
+            DisplayMetrics metrics = getContext().getResources().getDisplayMetrics();
+            tvName.setTextSize(20);
+            tvDate.setTextSize(16);
+            tvDate.setTextColor(Color.BLACK);
+
         }
-
-        //change appearance
-        DisplayMetrics metrics = getContext().getResources().getDisplayMetrics();
-        float Textsize =tvName.getTextSize()/metrics.density;
-        tvName.setTextSize(20);
-        tvName.setTextColor(Color.GREEN);
-        tvDate.setTextSize(10);
-        tvDate.setTextColor(Color.BLACK);
-        convertView.setBackgroundColor(Color.GRAY);
-
         // Return the completed view to render on screen
         return convertView;
     }

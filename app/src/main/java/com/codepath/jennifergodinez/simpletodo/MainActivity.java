@@ -112,19 +112,19 @@ public class MainActivity extends AppCompatActivity {
             // Update the selected item
             String newName = i.getExtras().getString("name");
             String newDate = i.getExtras().getString("date");
-            //String newPriority = i.getExtras().getString("priority");
+            String newPriority = i.getExtras().getString("priority");
             int pos = i.getExtras().getInt("pos", 0);
             ToDo td = todoArray.get(pos);
             td.name = newName;
             td.date=newDate;
-            //td.priority = newPriority;
+            td.priority = newPriority;
             cupboard().withDatabase(db).put(td);
             todosAdapter.notifyDataSetChanged();
         }
     }
 
     private static List<ToDo> getListFromQueryResultIterator(QueryResultIterable<ToDo> iter) {
-        final List<ToDo> items = new ArrayList<ToDo>();
+        final List<ToDo> items = new ArrayList<>();
         for (ToDo item : iter) {
             items.add(item);
         }
